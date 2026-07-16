@@ -64,14 +64,14 @@ export function ShopNavbar() {
     return () => { document.body.style.overflow = 'unset' }
   }, [mobileOpen])
 
-  const menuVariants = {
+ const menuVariants: any = { // Adding : any here stops the index signature error instantly
   closed: {
     opacity: 0,
     y: -20,
     scaleY: 0.95,
     transition: { 
       duration: 0.3, 
-      ease: [0.16, 1, 0.3, 1] as const, // Added as const
+      ease: "easeInOut", // Simplified to standard easing string
       when: "afterChildren" 
     }
   },
