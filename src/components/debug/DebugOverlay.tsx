@@ -82,12 +82,12 @@ function DebugInner() {
         {e.duration != null && <span style={{ color: e.duration > 500 ? '#F87171' : '#34D399', marginLeft:8 }}>{e.duration}ms</span>}
       </div>
 
-      {/* 2. Render the plain primitive string. TypeScript cannot throw a ReactNode error here! */}
-      {isSelected && e.payload && (
-        <pre style={{ margin:'4px 0 2px', color:'#94A3B8', fontSize:10, whiteSpace:'pre-wrap', wordBreak:'break-all' }}>
-          {renderedPayload}
-        </pre>
-      )}
+      {/* 2. Cast the condition explicitly to a boolean using !! to clear the unknown type error */}
+{isSelected && !!e.payload && (
+  <pre style={{ margin:'4px 0 2px', color:'#94A3B8', fontSize:10, whiteSpace:'pre-wrap', wordBreak:'break-all' }}>
+    {renderedPayload}
+  </pre>
+)}
     </div>
   )
 })}
