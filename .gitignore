@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Uploads (user generated)
+backend/uploads/products/*
+backend/uploads/brands/*
+!backend/uploads/products/.gitkeep
+!backend/uploads/brands/.gitkeep
+
+# Prisma
+backend/src/generated/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
