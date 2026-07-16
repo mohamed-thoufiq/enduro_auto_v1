@@ -55,26 +55,45 @@ function DebugInner() {
               <button onClick={() => setEntries([])} style={{ padding:'2px 7px', borderRadius:4, fontSize:10, cursor:'pointer', background:'transparent', border:'1px solid #1E293B', color:'#475569' }}>clear</button>
             </div>
           </div>
+          
           <div style={{ flex:1, overflowY:'auto', padding:'4px 0' }}>
             {visible.length === 0 && <div style={{ padding:20, color:'#334155', textAlign:'center' }}>Make API calls to see logs here</div>}
-            {visible.map((e, i) => (
-              <div key={i} onClick={() => setSelected(selected?.ts === e.ts ? null : e)}
-                style={{ padding:'4px 12px', cursor:'pointer', background: selected?.ts === e.ts ? '#1E293B' : 'transparent', borderLeft:`2px solid ${typeColor(e.type)}`, marginLeft:4, marginBottom:1 }}>
-                <div style={{ display:'flex', justifyBetween:'space-between' }}>
-                  <span style={{ color:typeColor(e.type), marginRight:8 }}>[{e.type}]</span>
-                  <span style={{ flex:1, color:'#CBD5E1', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{e.label}</span>
-                  {e.duration != null && <span style={{ color: e.duration > 500 ? '#F87171' : '#34D399', marginLeft:8 }}>{e.duration}ms</span>}
-                </div>
-                {selected?.ts === e.ts && e.payload && (
-                  /* CHANGED: Safely stringified the unknown payload as standard ReactNode string structure */
-                  <pre style={{ margin:'4px 0 2px', color:'#94A3B8', fontSize:10, whiteSpace:'pre-wrap', wordBreak:'break-all' }}>
-                    {JSON.stringify(e.payload as any, null, 2)}
-                  </pre>
-                )}
-              </div>
-            ))}
+            
+            {visible.map((e, i) => {
+  const isSelected = selected?.ts === e.ts;
+  
+  // 1. Process and cast the payload cleanly outside of the JSX render pass
+  let renderedPayload = '';
+  if (isSelected && e.payload) {
+    try {
+      renderedPayload = JSON.stringify(e.payload as any, null, 2);
+    } catch (err) {
+      renderedPayload = 'Error parsing log payload';
+    }
+  }
+
+  return (
+    <div key={i} onClick={() => setSelected(isSelected ? null : e)}
+      style={{ padding:'4px 12px', cursor:'pointer', background: isSelected ? '#1E293B' : 'transparent', borderLeft:`2px solid ${typeColor(e.type)}`, marginLeft:4, marginBottom:1 }}>
+      
+      <div style={{ display:'flex', justifyContent:'space-between' }}>
+        <span style={{ color:typeColor(e.type), marginRight:8 }}>[{e.type}]</span>
+        <span style={{ flex:1, color:'#CBD5E1', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{e.label}</span>
+        {e.duration != null && <span style={{ color: e.duration > 500 ? '#F87171' : '#34D399', marginLeft:8 }}>{e.duration}ms</span>}
+      </div>
+
+      {/* 2. Render the plain primitive string. TypeScript cannot throw a ReactNode error here! */}
+      {isSelected && e.payload && (
+        <pre style={{ margin:'4px 0 2px', color:'#94A3B8', fontSize:10, whiteSpace:'pre-wrap', wordBreak:'break-all' }}>
+          {renderedPayload}
+        </pre>
+      )}
+    </div>
+  )
+})}
             <div ref={bottomRef} />
           </div>
+          
           <div style={{ padding:'4px 12px', borderTop:'1px solid #1E293B', color:'#334155', fontSize:9 }}>Ctrl+Shift+D to toggle  •  Click entry to expand JSON</div>
         </div>
       )}
