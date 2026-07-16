@@ -110,9 +110,13 @@ export default function BrandsPage() {
   }
 
   const fadeInUp = {
-    initial: { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  initial: { opacity: 0, y: 24 },
+  animate: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { duration: 0.6, ease: "easeOut" as const } 
   }
+}
 
   return (
     <div className="bg-[#0a0a0a] min-h-screen text-gray-100 flex flex-col font-sans overflow-x-hidden">
