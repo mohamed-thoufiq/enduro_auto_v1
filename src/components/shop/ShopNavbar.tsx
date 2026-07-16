@@ -65,25 +65,42 @@ export function ShopNavbar() {
   }, [mobileOpen])
 
   const menuVariants = {
-    closed: {
-      opacity: 0,
-      y: -20,
-      scaleY: 0.95,
-      transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1], when: "afterChildren" }
-    },
-    opened: {
-      opacity: 1,
-      y: 0,
-      scaleY: 1,
-      transition: { type: "spring", duration: 0.5, bounce: 0.1, when: "beforeChildren", staggerChildren: 0.08 }
+  closed: {
+    opacity: 0,
+    y: -20,
+    scaleY: 0.95,
+    transition: { 
+      duration: 0.3, 
+      ease: [0.16, 1, 0.3, 1] as const, // Added as const
+      when: "afterChildren" 
+    }
+  },
+  opened: {
+    opacity: 1,
+    y: 0,
+    scaleY: 1,
+    transition: { 
+      type: "spring", 
+      duration: 0.5, 
+      bounce: 0.1, 
+      when: "beforeChildren", 
+      staggerChildren: 0.08 
     }
   }
+}
 
-  const linkVariants = {
-    closed: { opacity: 0, x: -16, scale: 0.98 },
-    opened: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } }
+const linkVariants = {
+  closed: { opacity: 0, x: -16, scale: 0.98 },
+  opened: { 
+    opacity: 1, 
+    x: 0, 
+    scale: 1, 
+    transition: { 
+      duration: 0.3, 
+      ease: "easeOut" as const // ADDED 'as const' HERE to fix the error!
+    } 
   }
-
+}
   return (
     <>
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
