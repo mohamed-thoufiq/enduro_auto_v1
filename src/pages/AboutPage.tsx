@@ -31,7 +31,7 @@ export default function AboutPage() {
   // 2. Define Animation Blueprint Configurations
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } }
+    animate: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" as const } }
   }
 
   const staggerContainer = {
