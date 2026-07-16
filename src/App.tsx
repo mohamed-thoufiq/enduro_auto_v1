@@ -11,14 +11,6 @@ import CartPage from '@/pages/CartPage'
 import CheckoutPage from '@/pages/CheckoutPage'
 import LoginPage from '@/pages/LoginPage'
 
-// Admin pages
-import AdminDashboard from '@/pages/admin/AdminDashboard'
-import AdminProductsPage from '@/pages/admin/AdminProductsPage'
-import AdminOrdersPage from '@/pages/admin/AdminOrdersPage'
-import AdminOrderDetailPage from '@/pages/admin/AdminOrderDetailPage'
-import AdminProductEditPage from '@/pages/admin/AdminProductEditPage'
-import AdminBrandsPage from '@/pages/admin/AdminBrandsPage'
-import AdminImportPage from '@/pages/admin/AdminImportPage'
 
 export default function App() {
   return (
@@ -34,15 +26,7 @@ export default function App() {
         <Route path="/checkout" element={<CheckoutPage />} />
         <Route path="/auth/login" element={<LoginPage />} />
 
-        {/* Admin */}
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProductsPage />} />
-        <Route path="/admin/products/edit" element={<AdminProductEditPage />} />
-        <Route path="/admin/orders" element={<AdminOrdersPage />} />
-        <Route path="/admin/orders/:id" element={<AdminOrderDetailPage />} />
-        <Route path="/admin/brands" element={<AdminBrandsPage />} />
-        <Route path="/admin/import" element={<AdminImportPage />} />
-
+ 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
