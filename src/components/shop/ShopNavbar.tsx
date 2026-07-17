@@ -8,8 +8,6 @@ export function ShopNavbar() {
   const { itemCount } = useCart()
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  
-  // 1. State to manage the "coming soon" toast visibility
   const [showLoginToast, setShowLoginToast] = useState(false)
   
   const location = useLocation()
@@ -26,7 +24,6 @@ export function ShopNavbar() {
     { name: 'Brands', href: '/brands' },
   ]
 
-  // Automatically hide toast after 3 seconds
   useEffect(() => {
     if (showLoginToast) {
       const timer = setTimeout(() => setShowLoginToast(false), 3000)
@@ -48,7 +45,7 @@ export function ShopNavbar() {
     const handleScroll = () => setIsScrolled(window.scrollY > 50)
     if (isHomePage) {
       handleScroll()
-      window.addEventListener('scroll', handleScroll)
+      window.addEventListener('scroll', handleScroll, { passive: true })
     } else {
       setIsScrolled(true)
     }
@@ -56,57 +53,56 @@ export function ShopNavbar() {
   }, [isHomePage])
 
   useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
+    // Avoid document layout thrashing on fast toggles
+    document.body.style.overflow = mobileOpen ? 'hidden' : 'unset'
     return () => { document.body.style.overflow = 'unset' }
   }, [mobileOpen])
 
- const menuVariants: any = { // Adding : any here stops the index signature error instantly
-  closed: {
-    opacity: 0,
-    y: -20,
-    scaleY: 0.95,
-    transition: { 
-      duration: 0.3, 
-      ease: "easeInOut", // Simplified to standard easing string
-      when: "afterChildren" 
-    }
-  },
-  opened: {
-    opacity: 1,
-    y: 0,
-    scaleY: 1,
-    transition: { 
-      type: "spring", 
-      duration: 0.5, 
-      bounce: 0.1, 
-      when: "beforeChildren", 
-      staggerChildren: 0.08 
+  // PERF: Optimized variants to utilize fast GPU compositing instead of intensive spring physics
+  const menuVariants: any = { 
+    closed: {
+      opacity: 0,
+      y: -12,
+      scaleY: 0.98,
+      transition: { 
+        duration: 0.18, 
+        ease: "easeIn",
+        when: "afterChildren" 
+      }
+    },
+    opened: {
+      opacity: 1,
+      y: 0,
+      scaleY: 1,
+      transition: { 
+        type: "tween", 
+        duration: 0.22, 
+        ease: "easeOut",
+        when: "beforeChildren", 
+        staggerChildren: 0.04 
+      }
     }
   }
-}
 
-const linkVariants = {
-  closed: { opacity: 0, x: -16, scale: 0.98 },
-  opened: { 
-    opacity: 1, 
-    x: 0, 
-    scale: 1, 
-    transition: { 
-      duration: 0.3, 
-      ease: "easeOut" as const // ADDED 'as const' HERE to fix the error!
-    } 
+  const linkVariants = {
+    closed: { opacity: 0, x: -8 },
+    opened: { 
+      opacity: 1, 
+      x: 0, 
+      transition: { 
+        duration: 0.15, 
+        ease: "easeOut" as const
+      } 
+    }
   }
-}
+
   return (
     <>
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
+      {/* PERF: Removed backdrop-blur on mobile views; restricted only to desktop viewports lg: */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 transform-gpu ${
         isHomePage && !isScrolled
           ? 'bg-transparent py-5 border-b border-transparent shadow-none'
-          : 'bg-[#111111]/95 backdrop-blur-md py-3 border-b border-white/10 shadow-lg'
+          : 'bg-[#111111] lg:bg-[#111111]/95 lg:backdrop-blur-md py-3 border-b border-white/10 shadow-lg'
       }`}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
@@ -136,8 +132,6 @@ const linkVariants = {
 
             {/* Global Action Icons */}
             <div className="flex items-center gap-4 text-white">
-              
-              {/* 2. Added onClick trigger to User button */}
               <button 
                 onClick={() => setShowLoginToast(true)}
                 className="hover:text-red-500 cursor-pointer transition-colors p-1 outline-none focus:text-red-500"
@@ -161,11 +155,11 @@ const linkVariants = {
                 <div className="relative w-6 h-6 flex items-center justify-center">
                   <AnimatePresence mode="wait">
                     {mobileOpen ? (
-                      <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                      <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
                         <X size={24} />
                       </motion.div>
                     ) : (
-                      <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                      <motion.div key="menu" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
                         <Menu size={24} />
                       </motion.div>
                     )}
@@ -185,11 +179,12 @@ const linkVariants = {
               exit="closed"
               variants={menuVariants}
               style={{ originY: 0 }}
-              className="lg:hidden absolute top-full left-0 w-full bg-[#111111] border-b border-white/10 shadow-2xl overflow-hidden"
+              // PERF: Added transform-gpu and will-change-transform to trigger hardware rendering layers
+              className="lg:hidden absolute top-full left-0 w-full bg-[#111111] border-b border-white/10 shadow-2xl overflow-hidden transform-gpu will-change-transform"
             >
               <div className="absolute inset-0 bg-gradient-to-b from-red-600/[0.03] to-transparent pointer-events-none" />
               
-              <div className="relative z-10 px-4 pt-4 pb-8 space-y-2 flex flex-col max-h-[85vh] overflow-y-auto">
+              <div className="relative z-10 px-4 pt-4 pb-8 space-y-2 flex flex-col max-h-[85vh] overflow-y-auto backward-scrolling-fix">
                 {navLinks.map(link => {
                   const isActive = pathname === link.href
                   return (
@@ -204,7 +199,7 @@ const linkVariants = {
                         }`}
                       >
                         <span>{link.name}</span>
-                        <span className={`text-xs transition-transform duration-300 ${isActive ? 'text-white opacity-80 translate-x-0' : 'text-gray-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'}`}>
+                        <span className={`text-xs transition-transform duration-200 ${isActive ? 'text-white opacity-80 translate-x-0' : 'text-gray-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0'}`}>
                           ➔
                         </span>
                       </Link>
@@ -217,15 +212,15 @@ const linkVariants = {
         </AnimatePresence>
       </nav>
 
-      {/* 3. Premium Animated Toast Notification Alert */}
+      {/* Premium Animated Toast Notification Alert */}
       <AnimatePresence>
         {showLoginToast && (
           <motion.div
-            initial={{ opacity: 0, y: -20, x: '-50%' }}
+            initial={{ opacity: 0, y: -15, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: -20, x: '-50%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-            className="fixed top-24 left-1/2 z-[9999] w-[calc(100%-2rem)] max-w-sm bg-zinc-900/95 border border-zinc-800 rounded-2xl p-4 shadow-2xl flex items-center gap-3.5 text-white backdrop-blur-md"
+            exit={{ opacity: 0, y: -15, x: '-50%' }}
+            transition={{ type: 'tween', duration: 0.2, ease: "easeOut" }}
+            className="fixed top-24 left-1/2 z-[9999] w-[calc(100%-2rem)] max-w-sm bg-zinc-900/95 border border-zinc-800 rounded-2xl p-4 shadow-2xl flex items-center gap-3.5 text-white transform-gpu will-change-transform"
           >
             <div className="bg-red-600/10 border border-red-500/20 text-red-500 p-2 rounded-xl flex-shrink-0">
               <Info size={18} />
