@@ -106,7 +106,7 @@ const linkVariants = {
       <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${
         isHomePage && !isScrolled
           ? 'bg-transparent py-5 border-b border-transparent shadow-none'
-          : 'bg-[#111111]/95 backdrop-blur-md py-3 border-b border-white/10 shadow-lg'
+          : 'bg-[#111111] lg:bg-[#111111]/95 lg:backdrop-blur-md py-3 border-b border-white/10 shadow-lg'
       }`}>
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
